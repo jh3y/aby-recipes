@@ -9,7 +9,8 @@ module.exports = [
 
       // @TODO: This breaks the profiler. So need to work out how to
       // profile only when necessary. Maybe with a UUID?
-      w.info('hello');
+      w.log('hello');
+      console.log(w.info, w.success);
       if (instance.env === 'dist') {
         w.info(`env: ${instance.env}`);
         instance.run('lint:styles').then(() => {

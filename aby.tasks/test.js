@@ -1,13 +1,21 @@
 module.exports = [
   {
-    name: 'TEST',
-    doc: 'getting require working :(',
+    name: 'FAKER',
+    doc : 'Test fake module',
     deps: [
-      'stylus'
+      'fake-module'
     ],
-    func: (s, instance) => {
+    func: function(fake, instance) {
       setTimeout(instance.resolve, 500);
     }
+  },
+  {
+    name: 'TEST',
+    doc: 'getting require working :(',
+    sequence: [
+      'A',
+      'B'
+    ]
   },
   {
     name: 'A',

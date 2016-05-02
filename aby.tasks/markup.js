@@ -22,7 +22,7 @@ module.exports = [
             const name = path.basename(file, '.pug');
             const loc = `${outputDir}${name}.html`;
             fs.writeFileSync(loc, markup);
-            winston.success(`${loc} created!`);
+            winston.log(`${loc} created!`);
           } catch (err) {
             instance.reject(err);
           }
