@@ -10,6 +10,7 @@ module.exports = [
       'uglify-js'
     ],
     func: function(fs, path, glob, mkdirp, uglify, aby) {
+      const isDist = aby.env === 'dist';
       const outputDir = aby.config.paths.destinations.scripts;
       const pushToServe = (filePath) => {
         mkdirp.sync(`${outputDir}src/js`);
@@ -18,13 +19,14 @@ module.exports = [
       };
       mkdirp.sync(outputDir);
       glob(aby.config.paths.sources.scripts, (err, files) => {
-        files.map(pushToServe);
+        if (!isDist) files.map(pushToServe);
         const res = uglify.minify(files, {
-          outSourceMap: 'source.js.map',
-          wrap: 'foo'
+          outSourceMap: (!isDist) ? 'source.js.map' : null,
+          wrap: 'aby-recipes',
+          beautify: true
         });
         fs.writeFileSync('public/js/scripts.js', res.code);
-        fs.writeFileSync('public/js/source.js.map', res.map);
+        if (!isDist) fs.writeFileSync('public/js/source.js.map', res.map);
         aby.resolve();
       });
     }
