@@ -43,28 +43,27 @@ module.exports = [
     doc: 'lint style src',
     deps: [
       'fs',
-      'stylint',
-      'winston'
+      'stylint'
     ],
-    func: (fs, s, w, instance) => {
+    func: (fs, stylint, aby) => {
       'use strict';
       const rc = JSON.parse(fs.readFileSync('.stylintrc', 'utf-8'));
-      s('src/stylus/', rc)
+      stylint('src/stylus/', rc)
         .methods({
           done: function () {
             if (this.cache.errs && this.cache.errs.length) {
               let errorMsg = '';
               for (const error of this.cache.errs)
                 errorMsg += `\n\n${error}\n`;
-              w.error(errorMsg);
+              aby.log.error(errorMsg);
             }
             if (this.cache.warnings && this.cache.warnings.length) {
               let warningMsg = '';
               for (const warning of this.cache.warnings)
                 warningMsg += `\n\n${warning}\n`;
-              w.warn(warningMsg);
+              aby.log.warn(warningMsg);
             }
-            instance.resolve();
+            aby.resolve();
           }
         })
         .create();
