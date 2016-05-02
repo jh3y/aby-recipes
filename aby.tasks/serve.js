@@ -8,11 +8,10 @@ module.exports = {
     'vinyl-file'
   ],
   pre: 'compile',
-  func: (bs, vss, vb, vf, bolt) => {
+  func: (bs, vss, vb, vf, aby) => {
     const server = bs.create();
-    const pluginOpts = bolt.config.pluginOpts;
-    server.init(pluginOpts.browsersync);
-    server.watch('public/**/*.*', (evt, file) => {
+    server.init(aby.config.pluginOpts.browsersync);
+    server.watch(aby.config.paths.sources.overwatch, (evt, file) => {
       if (evt === 'change' && file.indexOf('.css') === -1)
         server.reload();
       if (evt === 'change' && file.indexOf('.css') !== -1)

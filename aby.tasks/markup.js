@@ -1,33 +1,31 @@
 module.exports = [
   {
     name: 'compile:markup',
-    doc : 'compiles Pug(Jade)',
-    pre : 'lint:markup',
+    doc : 'compile markup',
     deps: [
       'fs',
       'glob',
-      'winston',
       'pug',
       'path',
       'mkdirp'
     ],
-    func: (fs, glob, winston, pug, path, mkdirp, instance) => {
-      const outputDir = instance.config.paths.destinations.markup;
+    func: (fs, glob, pug, path, mkdirp, aby) => {
+      const outputDir = aby.config.paths.destinations.markup;
       mkdirp.sync(outputDir);
-      glob(instance.config.paths.sources.docs, (err, files) => {
+      glob(aby.config.paths.sources.docs, (err, files) => {
         for (const file of files) {
           try {
-            const data = instance.config.pluginOpts.pug.data;
-            const markup = pug.compileFile(`${process.cwd()}/${file}`)(data);
-            const name = path.basename(file, '.pug');
-            const loc = `${outputDir}${name}.html`;
+            const data = aby.config.pluginOpts.pug.data,
+              markup = pug.compileFile(`${process.cwd()}/${file}`)(data),
+              name = path.basename(file, '.pug'),
+              loc = `${outputDir}${name}.html`;
             fs.writeFileSync(loc, markup);
-            winston.log(`${loc} created!`);
+            aby.log.info(`${loc} created!`);
           } catch (err) {
-            instance.reject(err);
+            aby.reject(err);
           }
         }
-        instance.resolve();
+        aby.resolve();
       });
     }
   },
@@ -37,29 +35,28 @@ module.exports = [
     deps: [
       'fs',
       'glob',
-      'winston',
       'pug-lint'
     ],
-    func: (fs, glob, w, p, instance) => {
+    func: (fs, glob, plinter, aby) => {
       'use strict';
       try {
-        const linter = new p();
-        const config = require(`${process.cwd()}/.puglintrc`);
+        const linter = new plinter(),
+          config = require(`${process.cwd()}/.puglintrc`);
         linter.configure(config);
-        glob(instance.config.paths.sources.markup, (err, files) => {
+        glob(aby.config.paths.sources.markup, (err, files) => {
           for (const file of files) {
             const errors = linter.checkFile(file);
             if (errors.length > 0) {
               var errString = `\n\n${errors.length} error/s found in ${file} \n`;
               for (const err of errors)
                 errString += `${err.msg} @ line ${err.line} column ${err.column}\n`;
-              w.error(errString);
+              aby.log.error(errString);
             }
           }
-          instance.resolve();
+          aby.resolve();
         });
       } catch (err) {
-        instance.reject(err);
+        aby.reject(err);
       }
     }
   },
@@ -67,14 +64,13 @@ module.exports = [
     name: 'watch:markup',
     doc: 'watch and compile markup files',
     deps: [
-      'winston',
       'gaze'
     ],
-    func: function(w, g, b) {
-      g(b.config.paths.sources.markup, (err, watcher) => {
+    func: function(gaze, aby) {
+      gaze(aby.config.paths.sources.markup, (err, watcher) => {
         watcher.on('changed', function(file) {
-          w.info(`${file} changed!`);
-          b.run('compile:markup');
+          aby.log.info(`${file} changed!`);
+          aby.run('compile:markup');
         });
       });
     }

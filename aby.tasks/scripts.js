@@ -3,32 +3,38 @@ module.exports = [
     name: 'compile:scripts',
     doc : 'compiles runtime JavaScript files',
     deps: [
-      'winston'
+      'fs',
+      'path',
+      'glob',
+      'mkdirp',
+      'uglify-js'
     ],
-    func: function(w, instance) {
-
-      // @TODO: This breaks the profiler. So need to work out how to
-      // profile only when necessary. Maybe with a UUID?
-      w.log('hello');
-      console.log(w.info, w.success);
-      if (instance.env === 'dist') {
-        w.info(`env: ${instance.env}`);
-        instance.run('lint:styles').then(() => {
-          instance.resolve();
+    func: function(fs, path, glob, mkdirp, uglify, aby) {
+      const outputDir = aby.config.paths.destinations.scripts;
+      const pushToServe = (filePath) => {
+        mkdirp.sync(`${outputDir}src/js`);
+        const content = fs.readFileSync(filePath);
+        fs.writeFileSync(`${outputDir}${filePath}`, content);
+      };
+      mkdirp.sync(outputDir);
+      glob(aby.config.paths.sources.scripts, (err, files) => {
+        files.map(pushToServe);
+        const res = uglify.minify(files, {
+          outSourceMap: 'source.js.map',
+          wrap: 'foo'
         });
-      } else
-        setTimeout(instance.resolve, 500);
+        fs.writeFileSync('public/js/scripts.js', res.code);
+        fs.writeFileSync('public/js/source.js.map', res.map);
+        aby.resolve();
+      });
     }
   },
   {
     name: 'lint:scripts',
     doc: 'lints scripts using eslint',
-    deps: [
-      'winston'
-    ],
-    func: function(w, instance) {
+    func: function(aby) {
       setTimeout(() => {
-        instance.reject('hhhhmmm');
+        aby.reject('hhhhmmm');
       }, 1000);
     }
   },
@@ -36,14 +42,13 @@ module.exports = [
     name: 'watch:scripts',
     doc: 'watch for script source changes then run and compile',
     deps: [
-      'gaze',
-      'winston'
+      'gaze'
     ],
-    func: function(g, w, b) {
-      g('./testSrc/**/*.js', (err, watcher) => {
+    func: function(gaze, aby) {
+      gaze(aby.config.paths.sources.scripts, (err, watcher) => {
         watcher.on('changed', (filepath) => {
-          w.info(`${filepath} changed!`);
-          b.run('compile:scripts');
+          aby.log.info(`${filepath} changed!`);
+          aby.run('compile:scripts');
         });
       });
     }

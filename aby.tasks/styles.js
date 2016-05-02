@@ -8,25 +8,24 @@ module.exports = [
       'cssnano',
       'path',
       'postcss',
-      'stylus',
-      'winston'
+      'stylus'
     ],
-    func: (fs, m, nano, p, postcss, s, w, instance) => {
+    func: (fs, mkdirp, nano, path, postcss, stylus, aby) => {
       'use strict';
-      const src = instance.config.paths.sources;
-      const dest = instance.config.paths.destinations;
-      let outputPath = `${dest.styles}${instance.config.name}.css`;
-      const stylString = fs.readFileSync(src.styles, 'utf-8');
-      s(stylString)
+      const src = aby.config.paths.sources,
+        dest = aby.config.paths.destinations,
+        stylString = fs.readFileSync(src.styles, 'utf-8');
+      let outputPath = `${dest.styles}${aby.config.name}.css`;
+      stylus(stylString)
         .set('paths', [
-          `${p.dirname(src.styles)}`
+          `${path.dirname(src.styles)}`
         ])
         .render((err, css) => {
-          m(p.dirname(outputPath), (err) => {
-            if (err) throw Error(err);
+          mkdirp(path.dirname(outputPath), (err) => {
+            if (err) aby.reject(err);
             fs.writeFileSync(outputPath, css);
-            if (instance.env === 'dist') {
-              const nanoOpts = instance.config.pluginOpts.cssnano;
+            if (aby.env === 'dist') {
+              const nanoOpts = aby.config.pluginOpts.cssnano;
               outputPath = outputPath.replace('.css', '.min.css');
               postcss([ nano(nanoOpts) ])
                 .process(css, {})
@@ -34,7 +33,7 @@ module.exports = [
                   fs.writeFileSync(outputPath, result.css);
                 });
             }
-            instance.resolve();
+            aby.resolve();
           });
         });
     }
@@ -75,14 +74,13 @@ module.exports = [
     name: 'watch:styles',
     doc: 'watch and compile style files',
     deps: [
-      'winston',
       'gaze'
     ],
-    func: function(w, g, b) {
-      g('src/**/*.styl', (err, watcher) => {
+    func: function(gaze, aby) {
+      gaze('src/**/*.styl', (err, watcher) => {
         watcher.on('changed', function(file) {
-          w.info(`${file} changed!`);
-          b.run('compile:styles');
+          aby.log.info(`${file} changed!`);
+          aby.run('compile:styles');
         });
       });
     }

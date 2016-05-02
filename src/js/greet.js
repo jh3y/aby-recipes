@@ -1,4 +1,4 @@
-const greet = (msg) => {
-  console.log(`${msg}`);
+var greet = function(msg) {
+  console.log(msg);
 };
 greet('Hello from boltzzz!');

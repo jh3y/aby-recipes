@@ -38,9 +38,10 @@ var pkg  = require('./package.json'),
     paths     : {
       sources: {
         styles   : src + 'stylus/style.styl',
-        scripts  : src + 'coffee/**/{greet,*}.coffee',
+        scripts  : src + 'js/**/{greet,*}.js',
         docs     : src + 'pug/*.pug',
-        markup   : src + 'pug/**/*.pug'
+        markup   : src + 'pug/**/*.pug',
+        overwatch: 'public/**/*.*'
       },
       destinations: {
         styles : env + 'css/',
