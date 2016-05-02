@@ -58,10 +58,8 @@ module.exports = [
   {
     name: 'Z',
     doc: 'Boilerplate half second timeout log',
-    deps: [
-      'winston'
-    ],
-    func: (w, instance) => {
+    pre: 'lint:scripts',
+    func: (instance) => {
       setTimeout(instance.resolve, 500);
     }
   },
@@ -72,6 +70,16 @@ module.exports = [
       'compile:scripts',
       'compile:styles'
     ]
+  },
+  {
+    name: 'L',
+    doc : 'test context',
+    func: (instance) => {
+      console.log(this);
+      Object.assign(this, instance);
+      console.log(this);
+      instance.resolve();
+    }
   },
   {
     name: 'F',
