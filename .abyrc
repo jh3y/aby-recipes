@@ -6,9 +6,9 @@ var pkg  = require('./package.json'),
     pluginOpts: {
       coffee     : {},
       browsersync: {
-        name: 'boltServer',
+        name: 'abyServer',
         server: 'public/',
-        port  : 1987
+        port  : 2222
       },
       cssnano    : {
         core: true,
