@@ -10,22 +10,22 @@ module.exports = [
       'postcss',
       'stylus'
     ],
-    func: (fs, mkdirp, nano, path, postcss, stylus, aby) => {
+    func: (fs, mkdirp, nano, path, postcss, stylus, russ) => {
       'use strict';
-      const src = aby.config.paths.sources,
-        dest = aby.config.paths.destinations,
+      const src = russ.config.paths.sources,
+        dest = russ.config.paths.destinations,
         stylString = fs.readFileSync(src.styles, 'utf-8');
-      let outputPath = `${dest.styles}${aby.config.name}.css`;
+      let outputPath = `${dest.styles}${russ.config.name}.css`;
       stylus(stylString)
         .set('paths', [
           `${path.dirname(src.styles)}`
         ])
         .render((err, css) => {
           mkdirp(path.dirname(outputPath), (err) => {
-            if (err) aby.reject(err);
+            if (err) russ.reject(err);
             fs.writeFileSync(outputPath, css);
-            if (aby.env === 'dist') {
-              const nanoOpts = aby.config.pluginOpts.cssnano;
+            if (russ.env === 'dist') {
+              const nanoOpts = russ.config.pluginOpts.cssnano;
               outputPath = outputPath.replace('.css', '.min.css');
               postcss([ nano(nanoOpts) ])
                 .process(css, {})
@@ -33,7 +33,7 @@ module.exports = [
                   fs.writeFileSync(outputPath, result.css);
                 });
             }
-            aby.resolve();
+            russ.resolve();
           });
         });
     }
@@ -45,7 +45,7 @@ module.exports = [
       'fs',
       'stylint'
     ],
-    func: (fs, stylint, aby) => {
+    func: (fs, stylint, russ) => {
       'use strict';
       const rc = JSON.parse(fs.readFileSync('.stylintrc', 'utf-8'));
       stylint('src/stylus/', rc)
@@ -55,15 +55,15 @@ module.exports = [
               let errorMsg = '';
               for (const error of this.cache.errs)
                 errorMsg += `\n\n${error}\n`;
-              aby.log.error(errorMsg);
+              russ.log.error(errorMsg);
             }
             if (this.cache.warnings && this.cache.warnings.length) {
               let warningMsg = '';
               for (const warning of this.cache.warnings)
                 warningMsg += `\n\n${warning}\n`;
-              aby.log.warn(warningMsg);
+              russ.log.warn(warningMsg);
             }
-            aby.resolve();
+            russ.resolve();
           }
         })
         .create();
@@ -75,11 +75,11 @@ module.exports = [
     deps: [
       'gaze'
     ],
-    func: function(gaze, aby) {
+    func: function(gaze, russ) {
       gaze('src/**/*.styl', (err, watcher) => {
         watcher.on('changed', function(file) {
-          aby.log.info(`${file} changed!`);
-          aby.run('compile:styles');
+          russ.log.info(`${file} changed!`);
+          russ.run('compile:styles');
         });
       });
     }

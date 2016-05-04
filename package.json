@@ -1,21 +1,21 @@
 {
-  "name": "aby-recipes",
+  "name": "russ-recipes",
   "version": "0.0.0",
-  "description": "my recipes for aby",
+  "description": "my recipes for russ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jh3y/aby-recipes.git"
+    "url": "git+https://github.com/jh3y/russ-recipes.git"
   },
   "author": "jh3y <jh3y@users.noreply.github.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jh3y/aby-recipes/issues"
+    "url": "https://github.com/jh3y/russ-recipes/issues"
   },
-  "homepage": "https://github.com/jh3y/aby-recipes#readme",
+  "homepage": "https://github.com/jh3y/russ-recipes#readme",
   "devDependencies": {
     "autoprefixer": "^6.3.6",
     "browser-sync": "^2.12.5",
