@@ -22,8 +22,7 @@ module.exports = [
         if (!isDist) files.map(pushToServe);
         const res = uglify.minify(files, {
           outSourceMap: (!isDist) ? 'source.js.map' : null,
-          wrap: 'russ-recipes',
-          beautify: true
+          wrap: 'recipes'
         });
         fs.writeFileSync('public/js/scripts.js', res.code);
         if (!isDist) fs.writeFileSync('public/js/source.js.map', res.map);
